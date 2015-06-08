@@ -7,3 +7,7 @@
 2. CI服务 Gitlab CI
 3. CI运行器  GitLab Runner-docker (项目地址 https://gitlab.com/gitlab-org/gitlab-ci-multi-runner)
 
+## 安装docker 
+  网络上各种环境的教程都有，这里不做赘述。
+## 在Gitlab上添加代码库
+## 将代码库添加到Github CI
