@@ -175,4 +175,55 @@ Copy ./ssh /root/.ssh // 覆盖该docker 容器的ssh
 docker-composer 具体文档 https://docs.docker.com/compose/
 docker-composer 成功之后
 
+修改Gitlab Runner-docker 运行镜像为我们最新构建的镜像，我这里起名为`yeting/laravel-deploy-docker`
+
 好了 这样我们部署脚本就完成了。
+
+## 优化过程
+前面已经完整的介绍了如何搭建一个简单够用的持续集成环境，但是在运行过程中，我们还会碰到一些问题，比如过 第三方包的依赖管理，每次跑环境的时候都需要从外网下载，在我大中(tian)国(chao)的网速下真心无奈。所以我们需要对中间的过程做一些优化。
+
+在我们的测试脚本中，有这么一段命令
+```
+composer config cache-dir /cache/composer
+```
+他的意思就是将composer的缓存目录更换到 `/cache/composer`目录下。
+为什么要换到`/cache`目录?
+
+我们执行
+```
+docker exec -it  multi-runner bash 
+```
+输出 `/data/config.toml`内容
+```
+[[runners]]
+  name = "test"
+  url = "https://ci.gitlab.com/"
+  token = "xxxxx"
+  executor = "docker"
+  [runners.docker]
+    image = "laravel-deploy-docker"
+    privileged = false
+    volumes = ["/cache"]
+```
+每一个runnner都会默认的配置一个 `/cache` 挂载，也就是说我们存在/cache目录下的文件会持续更新。
+我们利用这一特性，把我们地三方包下载时候的cache放在`/cache/composer`目录。run个几次之后，我们跑测试的时间从 `10+分钟` 变成 `10+秒` 超级炫酷，有木有！
+
+当然不仅仅只有composer可以这么做，其他有相似特性的第三方包管理工具都可以这么做。
+
+可能你还会问，跑测试脚本的时候可以这么做，但是我在部署的时候呢?就不应该这么做了。
+
+我这里有一种，简单粗暴。等我们第一次部署完成之后，我们可以将运行中代码的第三方包依赖目录(我这里是 `vendor`目录 )全部复制出来，放在我们的本机的源码目录下，每次在docker build的时候，能直接将第三方依赖包复制到运行目录，这样我们在构建过程中就不需要再下载了。
+
+当然这种方法还有一点缺点的，在项目的依赖包发生变化的时候，每次执行 composer install 的时候还是会需要去拉取变化的包。出现这样的情况我们就需要重复上面的操作。（这种方式真的是 简单并且粗暴 一点都不符合我那追求优雅的心 不过暂时我就探究到这种程度，如果有哪位大神有更加好的方式，请告诉我，我十分乐意改进）
+
+##总结
+一个简单够用的持续集成环境，就这样完成了，真不敢相信，是不是很简单？太酷了。
+Gitlab真的的是一个贴心的开发者伙伴。Docker是一项好技术，但是我们要以正式的姿势去使用它。
+
+要做一个能hold住技术的开发者，而不是盲目跟随潮流最求新技术的人。
+
+工具能提高人的效率，而产品的还坏最终还是在于人。
+
+这是我个人的第一篇技术博客，希望能与更多的人进行交流。
+
+本篇博客为个人原创，转载请联系 me@yeting.info
