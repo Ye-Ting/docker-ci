@@ -1,4 +1,4 @@
-# DaoCloud-Docker-ci
+# DaoCloud-Docker-CI
 基于Docker 与 DaoCloud 建立简单够用的持续集成环境
 
 ![DaoCloud-docker-ci](/daocloud-banner.jpg "DaoCloud-Docker")
