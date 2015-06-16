@@ -14,8 +14,8 @@
 1. 在coding.net上添加代码库
 1. 申请DaoCloud自有主机服务（目前在内测中需要申请）
 1. 安装docker
-1. 把代码库添加到DaoCloud生成项目
 1. 搭建基础 docker image
+1. 把代码库添加到DaoCloud生成项目
 1. 编写daocloud.yml
 1. 发布镜像
 1. 完成一个简单够用的持续集成环境
@@ -52,12 +52,6 @@ sudo service docker restart
 包含`主机ip`、`CPU使用率`、`内存使用率`、`磁盘使用率`、`主机上的容器`
 
 `主机上的容器`这个功能真的是太吊了，至于多么吊，大家自己试试看就知道了。所有信息一目了然 有木有!
-## 新建DaoCloud项目
-起项目名，绑定项目代码源，一个项目就建好了。还是很简单的。
-
-首次生成项目的时候会默认拉取`master`分支，构建一个`master-init`的镜像，只要构建成功，我们就能把这个镜像部署到我们自己的主机上。这个部署可比我上一篇 [基于docker 与 gitlab CI 做一个简单够用的持续集成环境](https://github.com/Ye-Ting/docker-ci/blob/master/gitlab.md)中的部署，简单好多，轻轻一点就行。构建是在DaoCloud服务器上做的，据说他们还备好了梯子给我们拉第三方库的时候好翻墙。
-
-记得在部署的时候选择自己关联到DaoCloud的主机，不然默认会部署在DaoCloud提供的主机上。DaoCloud提供的主机也还不错，就是访问速度慢了点，胜在不用钱的。不过我们都自己搭了主机，当然还是部署到我们自己的主机上是最妥的。
 
 ## 搭建基础docker image
 DaoCloud 提供了一些基础镜像用于搭建测试环境，貌似他们的提供的环境不是我想要的额，所以很多时候就要我们自己去DIY这个基础的运行镜像。自己DIY还是有蛮多好处的。
@@ -110,6 +104,15 @@ RUN composer global require "phpunit/phpunit=~4.0" "phpspec/phpspec=~2.1" "larav
 前人的经验真是数不胜数，前人创造的工具我们也好好好利用。`phpunit` `phpspec` 是PHP上的测试工具。`envoy`一个简易的部署工具，我们在后面的部署会用到。`a2enmod rewrite`apache开启url重写模块。
 
 基础镜像终于好了，我们的测试，部署可都是要靠它了。
+
+## 新建DaoCloud项目
+起项目名，绑定项目代码源，一个项目就建好了。还是很简单的。
+
+首次生成项目的时候会默认拉取`master`分支，构建一个`master-init`的镜像，(当然项目中是要包含Dockerfile)，只要构建成功，我们就能把这个镜像部署到我们自己的主机上。这个部署可比我上一篇 [基于docker 与 gitlab CI 做一个简单够用的持续集成环境](https://github.com/Ye-Ting/docker-ci/blob/master/gitlab.md)中的部署，简单好多，轻轻一点就行。构建是在DaoCloud服务器上做的，据说他们还备好了梯子给我们拉第三方库的时候好翻墙。
+
+记得在部署的时候选择自己关联到DaoCloud的主机，不然默认会部署在DaoCloud提供的主机上。DaoCloud提供的主机也还不错，就是访问速度慢了点，胜在不用钱的。不过我们都自己搭了主机，当然还是部署到我们自己的主机上是最妥的。
+
+我们可以开启`自动发布`功能，每当有镜像构建成功，DaoCloud就会帮我们自动发布。
 
 ## 编写daocloud.yml
 在DaoCloud代码测试需要用到DaoCloud。所以我们要先来看看官方的介绍。
